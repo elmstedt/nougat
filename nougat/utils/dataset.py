@@ -75,16 +75,17 @@ class LazyDataset(Dataset):
     Args:
         pdf (str): Path to the PDF document.
         prepare (Callable): A preparation function to process the images.
+        dpi (int): Resolution at which to render the PDF document as images.
 
     Attributes:
         name (str): Name of the PDF document.
     """
 
-    def __init__(self, pdf, prepare: Callable, pages: Optional[List[int]] = None):
+    def __init__(self, pdf, prepare: Callable, pages: Optional[List[int]] = None, dpi: Optional[int] = None):
         super().__init__()
         self.prepare = prepare
         self.name = str(pdf)
-        self.init_fn = partial(rasterize_paper, pdf, pages=pages)
+        self.init_fn = partial(rasterize_paper, pdf, pages=pages, dpi=dpi)
         self.dataset = None
         self.size = len(pypdf.PdfReader(pdf).pages) if pages is None else len(pages)
 

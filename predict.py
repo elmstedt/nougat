@@ -82,6 +82,12 @@ def get_args():
         type=str,
         help="Provide page numbers like '1-4,7' for pages 1 through 4 and page 7. Only works for single PDF input.",
     )
+    parser.add_argument(
+        "--dpi",
+        "-dpi",
+        type=int,
+        help="Set DPI resolution for image conversion",
+    )
     parser.add_argument("pdf", nargs="+", type=Path, help="PDF(s) to process.")
     args = parser.parse_args()
     if args.checkpoint is None or not args.checkpoint.exists():
@@ -119,6 +125,9 @@ def get_args():
         args.pages = pages
     else:
         args.pages = None
+    if args.dpi is None:
+        logging.info("DPI set to default: 96")
+        args.dpi = 96
     return args
 
 
@@ -146,6 +155,7 @@ def main():
                 pdf,
                 partial(model.encoder.prepare_input, random_padding=False),
                 args.pages,
+                args.dpi,
             )
         except pypdf.errors.PdfStreamError:
             logging.info(f"Could not load file {str(pdf)}.")
